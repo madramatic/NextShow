@@ -5,4 +5,5 @@ export interface Movie {
   poster_path: string;
   backdrop_path: string;
   release_date: string;
+  genre_ids?: number[];
 }

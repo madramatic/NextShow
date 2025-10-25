@@ -1,6 +1,6 @@
 import { Movie } from '../../domain/entities/movie';
 import { MovieRepository } from '../../domain/repositories/movie_repository';
-import { MovieRemoteDataSource } from '../datasources/movie_remote_data_source';
+import { MovieRemoteDataSource, Genre } from '../datasources/movie_remote_data_source';
 
 export class MovieRepositoryImpl implements MovieRepository {
   private remoteDataSource: MovieRemoteDataSource;
@@ -11,5 +11,17 @@ export class MovieRepositoryImpl implements MovieRepository {
 
   async getUpcomingMovies(page = 1): Promise<{ results: Movie[]; page: number; total_pages: number }> {
     return this.remoteDataSource.getUpcomingMovies(page);
+  }
+
+  async searchMovies(query: string, page = 1): Promise<{ results: Movie[]; page: number; total_pages: number }> {
+    return this.remoteDataSource.searchMovies(query, page);
+  }
+
+  async discoverMoviesByGenre(genreId: number, page = 1): Promise<{ results: Movie[]; page: number; total_pages: number }> {
+    return this.remoteDataSource.discoverMoviesByGenre(genreId, page);
+  }
+
+  async getGenres(): Promise<Genre[]> {
+    return this.remoteDataSource.getGenres();
   }
 }

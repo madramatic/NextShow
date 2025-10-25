@@ -1,17 +1,19 @@
-import React, { useMemo, useState, useEffect } from 'react';
+import React, { useMemo, useState, useEffect, useCallback } from 'react';
 import {
   View,
-  TextInput,
   StyleSheet,
   FlatList,
+  ActivityIndicator,
   Dimensions,
-  Pressable,
   Text,
 } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
-import { useRouter, useNavigation } from 'expo-router';
+import { useRouter, useNavigation, useLocalSearchParams } from 'expo-router';
+import { useDispatch, useSelector } from 'react-redux';
 import theme from '../../../core/theme';
 import GenreCard from './components/GenreCard';
+import { searchMovies, discoverMoviesByGenre, clearSearchResults, fetchGenres } from '../../redux/searchSlice';
+import { RootState, AppDispatch } from '../../redux/store';
+import SearchResultItem from './components/SearchResultItem';
 import AppBar from '../../components/AppBar';
 
 const { width: WINDOW_WIDTH } = Dimensions.get('window');
@@ -21,57 +23,126 @@ const CARD_WIDTH = (WINDOW_WIDTH - H_SPACING * (NUM_COLS + 1)) / NUM_COLS;
 const CARD_HEIGHT = Math.round(CARD_WIDTH * 0.62);
 
 const GENRES = [
-  { id: 'Comedies', title: 'Comedies', image: require('../../../../assets/images/genres/Comedies.jpg') },
-  { id: 'Crime', title: 'Crime', image: require('../../../../assets/images/genres/Crime.jpg') },
-  { id: 'Family', title: 'Family', image: require('../../../../assets/images/genres/Family.jpg') },
-  { id: 'Documentaries', title: 'Documentaries', image: require('../../../../assets/images/genres/Documentaries.jpg') },
-  { id: 'Dramas', title: 'Dramas', image: require('../../../../assets/images/genres/Dramas.jpg') },
-  { id: 'Fantasy', title: 'Fantasy', image: require('../../../../assets/images/genres/Fantasy.jpg') },
-  { id: 'Holidays', title: 'Holidays', image: require('../../../../assets/images/genres/Holidays.jpg') },
-  { id: 'Horror', title: 'Horror', image: require('../../../../assets/images/genres/Horror.jpg') },
-  { id: 'Sci-Fi', title: 'Sci-Fi', image: require('../../../../assets/images/genres/Sci-Fi.jpg') },
-  { id: 'Thriller', title: 'Thriller', image: require('../../../../assets/images/genres/Thriller.jpg') },
+  { id: 35, title: 'Comedies', image: require('../../../../assets/images/genres/Comedies.jpg') },
+  { id: 80, title: 'Crime', image: require('../../../../assets/images/genres/Crime.jpg') },
+  { id: 10751, title: 'Family', image: require('../../../../assets/images/genres/Family.jpg') },
+  { id: 99, title: 'Documentaries', image: require('../../../../assets/images/genres/Documentaries.jpg') },
+  { id: 18, title: 'Dramas', image: require('../../../../assets/images/genres/Dramas.jpg') },
+  { id: 14, title: 'Fantasy', image: require('../../../../assets/images/genres/Fantasy.jpg') },
+  { id: 10770, title: 'Holidays', image: require('../../../../assets/images/genres/Holidays.jpg') },
+  { id: 27, title: 'Horror', image: require('../../../../assets/images/genres/Horror.jpg') },
+  { id: 878, title: 'Sci-Fi', image: require('../../../../assets/images/genres/Sci-Fi.jpg') },
+  { id: 53, title: 'Thriller', image: require('../../../../assets/images/genres/Thriller.jpg') },
 ];
 
 const SearchScreen: React.FC = () => {
   const [query, setQuery] = useState('');
   const router = useRouter();
   const navigation = useNavigation();
+  const dispatch = useDispatch<AppDispatch>();
+  const params = useLocalSearchParams<{ genre?: string }>();
+  
+  const { searchResults, loading, genres } = useSelector((state: RootState) => state.search);
 
   useEffect(() => {
     navigation.setOptions?.({ headerShown: false });
   }, [navigation]);
 
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return GENRES;
-    return GENRES.filter((g) => g.title.toLowerCase().includes(q));
-  }, [query]);
+  useEffect(() => {
+    dispatch(fetchGenres());
+  }, [dispatch]);
 
-  const renderItem = ({ item }: { item: typeof GENRES[0] }) => (
+  useEffect(() => {
+    if (params.genre) {
+      const genre = GENRES.find(g => g.title.toLowerCase() === params.genre?.toLowerCase());
+      if (genre) {
+        dispatch(discoverMoviesByGenre(genre.id));
+        setQuery('');
+      }
+    }
+  }, [params.genre, dispatch]);
+
+  useEffect(() => {
+    const trimmedQuery = query.trim();
+    if (!trimmedQuery) {
+      dispatch(clearSearchResults());
+      return;
+    }
+
+    const timer = setTimeout(() => {
+      dispatch(searchMovies(trimmedQuery));
+    }, 400);
+
+    return () => clearTimeout(timer);
+  }, [query, dispatch]);
+
+  const handleClear = useCallback(() => {
+    setQuery('');
+    dispatch(clearSearchResults());
+    if (params.genre) {
+      router.setParams({ genre: undefined });
+    }
+  }, [dispatch, params.genre, router]);
+
+  const renderGenreItem = useCallback(({ item }: { item: typeof GENRES[0] }) => (
     <View style={styles.cardWrap}>
       <GenreCard
         title={item.title}
         image={item.image}
         width={CARD_WIDTH}
         height={CARD_HEIGHT}
-        onPress={() => router.push({ pathname: '/search', params: { genre: item.id } })}
+        onPress={() => router.push({ pathname: '/search', params: { genre: item.title } })}
       />
     </View>
-  );
+  ), [router]);
+
+  const renderMovieItem = useCallback(({ item }: { item: any }) => (
+    <SearchResultItem
+      item={item}
+      genres={genres}
+      onPress={() => router.push({ pathname: '/[movieId]', params: { movieId: String(item.id) } })}
+    />
+  ), [router, genres]);
+
+  const showResults = query.trim() || params.genre;
 
   return (
     <View style={styles.container}>
-      <AppBar searchMode searchValue={query} onSearchChange={setQuery} onClear={() => setQuery('')} />
+      <AppBar searchMode searchValue={query} onSearchChange={setQuery} onClear={handleClear} />
 
-      <FlatList
-        data={filtered}
-        keyExtractor={(i) => i.id}
-        renderItem={renderItem}
-        numColumns={NUM_COLS}
-        contentContainerStyle={styles.listContent}
-        showsVerticalScrollIndicator={false}
-      />
+      {showResults ? (
+        <View style={styles.resultsContainer}>
+          {loading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="small" color={theme.colors.dark} />
+            </View>
+          ) : (
+            <View style={styles.resultsWrapper}>
+              <View style={styles.resultsHeader}>
+                <Text style={styles.resultsTitle}>Top Results</Text>
+              </View>
+              <View style={styles.separator} />
+              <FlatList
+                data={searchResults}
+                keyExtractor={(i) => String(i.id)}
+                renderItem={renderMovieItem}
+                contentContainerStyle={styles.resultsListContent}
+                showsVerticalScrollIndicator={false}
+                ItemSeparatorComponent={() => <View style={styles.itemSeparator} />}
+              />
+            </View>
+          )}
+        </View>
+      ) : (
+        <FlatList
+          data={GENRES}
+          keyExtractor={(i) => String(i.id)}
+          renderItem={renderGenreItem}
+          numColumns={NUM_COLS}
+          contentContainerStyle={styles.listContent}
+          showsVerticalScrollIndicator={false}
+        />
+      )}
     </View>
   );
 };
@@ -81,29 +152,36 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: theme.colors.light,
   },
-  searchBarWrap: {
-    paddingTop: 16,
-    paddingHorizontal: 16,
+  resultsContainer: {
+    flex: 1,
+  },
+  loadingContainer: {
+    padding: 20,
+  },
+  resultsWrapper: {
+    flex: 1,
+  },
+  resultsHeader: {
+    paddingHorizontal: H_SPACING,
+    paddingTop: 8,
     paddingBottom: 8,
   },
-  searchBar: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#fff',
-    borderRadius: 999,
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    shadowColor: '#000',
-    shadowOpacity: 0.04,
-    shadowRadius: 6,
-    elevation: 2,
-  },
-  input: {
-    flex: 1,
-    marginLeft: 8,
-    fontSize: 16,
+  resultsTitle: {
+    fontFamily: theme.fonts.medium,
     color: theme.colors.dark,
-    fontFamily: theme.fonts.regular,
+    fontSize: 14,
+  },
+  separator: {
+    height: 1,
+    backgroundColor: '#e6e6e6',
+  },
+  resultsListContent: {
+    paddingBottom: 48,
+  },
+  itemSeparator: {
+    height: 1,
+    backgroundColor: '#e6e6e6',
+    marginLeft: H_SPACING + 72 + 12,
   },
   listContent: {
     paddingHorizontal: H_SPACING,
