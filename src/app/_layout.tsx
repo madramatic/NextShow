@@ -1,8 +1,11 @@
 
+
 import { Stack } from 'expo-router';
 import React from 'react';
+import { View, StyleSheet } from 'react-native';
 import { useFonts } from 'expo-font';
 import AppLoading from 'expo-app-loading';
+import BottomNavBar from '../presentation/components/BottomNavBar/BottomNavBar';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -17,5 +20,10 @@ export default function RootLayout() {
     return <AppLoading />;
   }
 
-  return <Stack />;
+  return (
+    <View style={{ flex: 1 }}>
+      <Stack />
+      <BottomNavBar />
+    </View>
+  );
 }
