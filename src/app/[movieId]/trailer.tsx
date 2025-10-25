@@ -1,12 +1,8 @@
 import React from 'react';
-import { View, Text } from 'react-native';
 import { useLocalSearchParams } from 'expo-router';
+import TrailerScreen from '../../presentation/screens/Trailer/TrailerScreen';
 
-export default function TrailerScreen() {
-  const { movieId } = useLocalSearchParams();
-  return (
-    <View style={{ flex: 1, alignItems: 'center', justifyContent: 'center' }}>
-      <Text>Trailer for Movie ID: {movieId}</Text>
-    </View>
-  );
+export default function Page() {
+  const { movieId } = useLocalSearchParams<{ movieId: string }>();
+  return <TrailerScreen movieId={movieId} />;
 }
