@@ -22,18 +22,4 @@ export const colors: ColorPalette = {
   mint: '#64D2C0',
 };
 
-
-export const fonts = {
-  regular: 'Poppins-Regular',
-  medium: 'Poppins-Medium',
-  bold: 'Poppins-Bold',
-  light: 'Poppins-Light',
-  italic: 'Poppins-Italic',
-};
-
-export const theme = {
-  colors,
-  fonts,
-};
-
-export type Theme = typeof theme;
+export default colors;

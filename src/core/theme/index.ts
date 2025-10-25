@@ -1,4 +1,4 @@
-import { colors } from '../theme';
+import colors from './colors';
 import fonts from './fonts';
 import spacing from './spacing';
 import shape from './shape';

@@ -1,11 +1,14 @@
 
 
+
 import { Stack } from 'expo-router';
 import React from 'react';
 import { View, StyleSheet } from 'react-native';
 import { useFonts } from 'expo-font';
 import AppLoading from 'expo-app-loading';
 import BottomNavBar from '../presentation/components/BottomNavBar/BottomNavBar';
+import { Provider } from 'react-redux';
+import store from '../presentation/redux/store';
 
 export default function RootLayout() {
   const [fontsLoaded] = useFonts({
@@ -21,9 +24,11 @@ export default function RootLayout() {
   }
 
   return (
-    <View style={{ flex: 1 }}>
-      <Stack />
-      <BottomNavBar />
-    </View>
+    <Provider store={store}>
+      <View style={{ flex: 1 }}>
+        <Stack />
+        <BottomNavBar />
+      </View>
+    </Provider>
   );
 }

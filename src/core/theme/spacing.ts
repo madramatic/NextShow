@@ -1,4 +1,3 @@
-// Spacing constants for consistent layout
 const spacing = {
   navbarHorizontal: 28,
   navbarBottom: 20,
