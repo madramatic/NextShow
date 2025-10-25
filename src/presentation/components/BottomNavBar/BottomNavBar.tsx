@@ -5,15 +5,14 @@ import { useRouter, useSegments } from 'expo-router';
 import { Ionicons, MaterialIcons, Feather } from '@expo/vector-icons';
 import theme from '../../../core/theme/index';
 
-// Constants for BottomNavBar
-const NAVBAR_RADIUS = theme.shape.navbarRadius;
-const NAVBAR_PADDING_HORIZONTAL = theme.spacing.navbarHorizontal;
-const NAVBAR_PADDING_BOTTOM = theme.spacing.navbarBottom;
-const NAVBAR_PADDING_TOP = theme.spacing.navbarTop;
-const ICON_SIZE = theme.sizes.icon;
+const NAVBAR_RADIUS = 28;
+const NAVBAR_PADDING_HORIZONTAL = 28;
+const NAVBAR_PADDING_BOTTOM = 20;
+const NAVBAR_PADDING_TOP = 12;
+const ICON_SIZE = 24;
 const ICON_OPACITY_DISABLED = 0.5;
-const LABEL_FONT_SIZE = theme.sizes.labelFont;
-const LABEL_LETTER_SPACING = theme.spacing.labelLetterSpacing;
+const LABEL_FONT_SIZE = 11;
+const LABEL_LETTER_SPACING = 0.1;
 
 type TabConfig = {
   label: string;
@@ -25,25 +24,25 @@ type TabConfig = {
 const TABS: TabConfig[] = [
   {
     label: 'Dashboard',
-    icon: <MaterialIcons name="dashboard" />, // color/size set dynamically
+    icon: <MaterialIcons name="dashboard" />,
     route: '/dashboard',
     testID: 'tab-dashboard',
   },
   {
     label: 'Watch',
-    icon: <Ionicons name="play-circle" />, // color/size set dynamically
+    icon: <Ionicons name="play-circle" />,
     route: '/',
     testID: 'tab-watch',
   },
   {
     label: 'Media Library',
-    icon: <Feather name="archive" />, // color/size set dynamically
+    icon: <Feather name="archive" />,
     route: '/media',
     testID: 'tab-media',
   },
   {
     label: 'More',
-    icon: <Feather name="menu" />, // color/size set dynamically
+    icon: <Feather name="menu" />,
     route: '/more',
     testID: 'tab-more',
   },
