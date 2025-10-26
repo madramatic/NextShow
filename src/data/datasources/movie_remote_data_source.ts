@@ -2,6 +2,7 @@ import axios from 'axios';
 import secrets from '../../core/config/secrets';
 import { Movie } from '../../domain/entities/movie';
 import { MovieDetail, Genre } from '../../domain/entities/movie_detail';
+import { MovieVideo } from '../../domain/entities/video';
 
 export class MovieRemoteDataSource {
   async getUpcomingMovies(page = 1): Promise<{ results: Movie[]; page: number; total_pages: number }> {
@@ -133,5 +134,17 @@ export class MovieRemoteDataSource {
     };
 
     return movieDetail;
+  }
+
+  async getMovieVideos(movieId: number): Promise<MovieVideo[]> {
+    const response = await axios.get(`${secrets.TMDB_BASE_URL}/movie/${movieId}/videos`, {
+      params: {
+        api_key: secrets.TMDB_API_KEY,
+        language: 'en-US',
+      },
+    });
+
+    const data = response.data as { results: MovieVideo[] };
+    return data.results || [];
   }
 }

@@ -1,5 +1,6 @@
 import { Movie } from '../../domain/entities/movie';
 import { MovieDetail, Genre } from '../../domain/entities/movie_detail';
+import { MovieVideo } from '../../domain/entities/video';
 import { MovieRepository } from '../../domain/repositories/movie_repository';
 import { MovieRemoteDataSource } from '../datasources/movie_remote_data_source';
 
@@ -28,5 +29,9 @@ export class MovieRepositoryImpl implements MovieRepository {
 
   async getMovieDetails(movieId: number): Promise<MovieDetail> {
     return this.remoteDataSource.getMovieDetails(movieId);
+  }
+
+  async getMovieVideos(movieId: number): Promise<MovieVideo[]> {
+    return this.remoteDataSource.getMovieVideos(movieId);
   }
 }
