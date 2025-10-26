@@ -6,6 +6,7 @@ import {
   ActivityIndicator,
   Dimensions,
   Text,
+  useWindowDimensions,
 } from 'react-native';
 import { useRouter, useNavigation, useLocalSearchParams } from 'expo-router';
 import { useDispatch, useSelector } from 'react-redux';
@@ -16,11 +17,9 @@ import { RootState, AppDispatch } from '../../redux/store';
 import SearchResultItem from './components/SearchResultItem';
 import AppBar from '../../components/AppBar';
 
-const { width: WINDOW_WIDTH } = Dimensions.get('window');
+
 const H_SPACING = 16;
-const NUM_COLS = 2;
-const CARD_WIDTH = (WINDOW_WIDTH - H_SPACING * (NUM_COLS + 1)) / NUM_COLS;
-const CARD_HEIGHT = Math.round(CARD_WIDTH * 0.62);
+const CARD_ASPECT_RATIO = 0.62;
 
 const GENRES = [
   { id: 35, title: 'Comedies', image: require('../../../../assets/images/genres/Comedies.jpg') },
@@ -42,7 +41,16 @@ const SearchScreen: React.FC = () => {
   const dispatch = useDispatch<AppDispatch>();
   const params = useLocalSearchParams<{ genre?: string }>();
   
+
   const { searchResults, loading, genres } = useSelector((state: RootState) => state.search);
+  const window = useWindowDimensions();
+
+  const isLandscape = window.width > window.height;
+  const numColumns = isLandscape ? (window.width > 900 ? 4 : 3) : 2;
+  const cardWidth = useMemo(() => {
+    return (window.width - H_SPACING * (numColumns + 1)) / numColumns;
+  }, [window.width, numColumns]);
+  const cardHeight = Math.round(cardWidth * CARD_ASPECT_RATIO);
 
   useEffect(() => {
     navigation.setOptions?.({ headerShown: false });
@@ -85,16 +93,16 @@ const SearchScreen: React.FC = () => {
   }, [dispatch, params.genre, router]);
 
   const renderGenreItem = useCallback(({ item }: { item: typeof GENRES[0] }) => (
-    <View style={styles.cardWrap}>
+    <View style={[styles.cardWrap, { width: cardWidth }]}> 
       <GenreCard
         title={item.title}
         image={item.image}
-        width={CARD_WIDTH}
-        height={CARD_HEIGHT}
+        width={cardWidth}
+        height={cardHeight}
         onPress={() => router.push({ pathname: '/search', params: { genre: item.title } })}
       />
     </View>
-  ), [router]);
+  ), [router, cardWidth, cardHeight]);
 
   const renderMovieItem = useCallback(({ item }: { item: any }) => (
     <SearchResultItem
@@ -138,9 +146,11 @@ const SearchScreen: React.FC = () => {
           data={GENRES}
           keyExtractor={(i) => String(i.id)}
           renderItem={renderGenreItem}
-          numColumns={NUM_COLS}
+          numColumns={numColumns}
           contentContainerStyle={styles.listContent}
           showsVerticalScrollIndicator={false}
+          extraData={numColumns}
+          key={`genres-grid-cols-${numColumns}`}
         />
       )}
     </View>
