@@ -1,4 +1,4 @@
-import { Genre } from '../../data/datasources/movie_remote_data_source';
+import { Genre } from '../entities/movie_detail';
 import { MovieRepository } from '../repositories/movie_repository';
 
 export class GetGenresUseCase {

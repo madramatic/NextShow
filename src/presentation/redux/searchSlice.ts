@@ -1,6 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import { Movie } from '../../domain/entities/movie';
-import { Genre } from '../../data/datasources/movie_remote_data_source';
+import { Genre } from '../../domain/entities/movie_detail';
 import { MovieRepositoryImpl } from '../../data/repositories/movie_repository_impl';
 import { MovieRemoteDataSource } from '../../data/datasources/movie_remote_data_source';
 

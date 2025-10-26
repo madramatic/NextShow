@@ -2,7 +2,7 @@ import React from 'react';
 import { View, Text, Image, StyleSheet, Pressable } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import theme from '../../../../core/theme';
-import { Genre } from '../../../../data/datasources/movie_remote_data_source';
+import { Genre } from '../../../../domain/entities/movie_detail';
 
 type Props = {
   item: any;

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { useNavigation } from 'expo-router';
+import { useNavigation, useRouter } from 'expo-router';
 import { View, Text, FlatList, StyleSheet, ActivityIndicator } from 'react-native';
 import AppBar from '../../components/AppBar';
 import { useDispatch, useSelector } from 'react-redux';
@@ -10,6 +10,7 @@ import MovieCard from './components/MovieCard';
 
 const MovieListScreen = () => {
   const navigation = useNavigation();
+  const router = useRouter();
   useEffect(() => {
     navigation.setOptions?.({ headerShown: false });
   }, [navigation]);
@@ -23,7 +24,12 @@ const MovieListScreen = () => {
     dispatch(fetchUpcomingMovies(1) as any);
   }, [dispatch]);
 
-  const renderItem = ({ item }: any) => <MovieCard item={item} />;
+  const renderItem = ({ item }: any) => (
+    <MovieCard
+      item={item}
+      onPress={() => router.push({ pathname: '/[movieId]', params: { movieId: String(item.id) } })}
+    />
+  );
 
   if (loading && (!movies || movies.length === 0)) {
     return <ActivityIndicator style={styles.centered} size="large" color={theme.colors.blue} />;
