@@ -86,7 +86,7 @@ const handleTabPress = (router: ReturnType<typeof useRouter>, route: string, dis
 const BottomNavBar: React.FC = () => {
   const router = useRouter();
   const segments = useSegments();
-  if (segments.includes('trailer')) return null;
+  if (segments.includes('trailer') || segments.includes('seats')) return null;
   const activeIndex = getActiveIndex(segments);
 
   return (

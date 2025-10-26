@@ -122,7 +122,14 @@ export default function MovieDetailScreen({ movieId }: Props) {
             )}
             <Text style={styles.releaseInfo}>In Theaters {formattedDate}</Text>
 
-            <Pressable style={styles.ticketsButton} accessibilityRole="button">
+            <Pressable
+              style={styles.ticketsButton}
+              onPress={() => router.push({
+                pathname: '/seats',
+                params: { movieId: String(movieId), title: movieDetail.title }
+              })}
+              accessibilityRole="button"
+            >
               <Text style={styles.ticketsButtonText}>Get Tickets</Text>
             </Pressable>
 
