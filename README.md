@@ -2,6 +2,9 @@
 
 A modern React Native app for discovering, viewing, and booking upcoming movies. Built with Expo, TypeScript, and Clean Architecture for scalability and maintainability.
 
+## Demo Video
+[▶ Watch Demo on Google Drive](https://drive.google.com/file/d/1w-CMa1YnOaz3W6X0oHwgZtOaDsAugRQN/view?usp=drive_link)
+
 ## Features
 - **Upcoming Movies**: Browse a list of upcoming movies (powered by TMDb API)
 - **Movie Details**: View detailed info, genres, and trailers
